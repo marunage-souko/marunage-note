@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="丸投げ倉庫">
+<meta name="referrer" content="no-referrer">
+<title>丸投げ倉庫</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f4f5f7; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  .msg { font: 15px/1.8 -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #1d2430; padding: 24px; }
+  .msg a { color: #1f6fb2; }
+</style>
+</head>
+<body>
+<script>
+/* 丸投げ倉庫の「スマホの出品ノート」を、Google の注意書きの帯なしで開くための入口。
+ * 各自の出品ノートの住所（鍵つき）は「#」より後ろで受け取る。「#」より後ろはブラウザの外へ送られないので、
+ * このページを置いている場所には、住所も鍵も届かない。
+ * 開けるのは Google Apps Script の出品ノートだけ（ほかのサイトを埋め込ませない）。 */
+(function () {
+  var 形 = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec\?k=[0-9a-f]{20,64}(&n=\d{1,2})?$/;
+  var 住所 = '';
+  try { 住所 = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+  // ホーム画面から開いたときに「#」が落ちていても開けるよう、この端末に覚えておく
+  try {
+    if (形.test(住所)) localStorage.setItem('kapi_note', 住所);
+    else 住所 = localStorage.getItem('kapi_note') || '';
+  } catch (e) {}
+  if (!形.test(住所)) {
+    document.body.innerHTML = '<div class="msg">丸投げ倉庫の設定画面「📱 スマホの出品ノート」の QRコードから開いてください。</div>';
+    return;
+  }
+  var f = document.createElement('iframe');
+  f.src = 住所;
+  // 写真をまとめて保存（共有）と、文のコピーを中で使えるようにする
+  f.allow = 'web-share; clipboard-write';
+  f.title = '丸投げ倉庫 出品ノート';
+  document.body.appendChild(f);
+})();
+</script>
+</body>
+</html>
